@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
@@ -19,12 +20,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//@Configuration
+@Configuration
+//@EnableGlobalMethodSecurity(
+//		  prePostEnabled = true, 
+//		  securedEnabled = true, 
+//		  jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class BasicAuthSecurtiyConfiguration {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((requests) -> requests.anyRequest().authenticated());
+		http.authorizeHttpRequests((requests) -> requests
+				.requestMatchers("/users").hasRole("USER")
+				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.anyRequest().authenticated());
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		// http.formLogin();
